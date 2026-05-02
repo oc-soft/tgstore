@@ -3,10 +3,10 @@
 I describe about tgstore file format.
 
 |No.|offset|size|endian|Name|description|
-|--|--|--|--|--|
+|--|--|--|--|--|--|
 |1.|0|4||marker|represent marker about this file format. ['T','S','T','R']|
 |2.|4|4|LE|header size|meta data size about contents|
-|3.|8||header + size|utf-8 json formated header|max size is less than 32bit bytes|
+|3.|8|header + size||utf-8 json formated header|max size is less than 32bit bytes|
 |4.|8 + header size||content||
 
 ## standard json header
