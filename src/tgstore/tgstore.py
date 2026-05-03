@@ -1,6 +1,8 @@
 import math
 import os
+import pathlib
 import sys
+import tempfile
 
 from .header import Header
 
@@ -53,9 +55,26 @@ class TgStore:
             tgstore.read_marker(strm)
             result, _ = tgstore.read_header(strm)
         return result
+
+    @classmethod
+    def save_header(cls,
+            header_data,
+            store_path,
+            chunk_size: int = 1024 ** 2):
+        """ save header """
+        with tempfile.TemporaryFile() as tmp_content_strm:
+            old_header = cls.read(store_path, tmp_content_strm, chunk_size)
+            if isinstance(header_data, Header): 
+                header_data = header_data.header
+            new_header = dict(header_data) 
+            new_header['content-length'] = old_header.content_length 
+            tmp_content_strm.seek(0, os.SEEK_SET)
+            cls.save_stream(new_header, tmp_content_strm, store_path)
+        
         
     @classmethod
     def read(cls, store_path, dst_strm, chunk_size: int = 1024 ** 2):
+        """ read content """
         result = None
         with open(store_path, "rb") as strm:
             tgstore = TgStore(chunk_size)
