@@ -44,7 +44,6 @@ class TgStore:
 
     @classmethod
     def read_header(cls, 
-        header_data,
         store_path):
         """ save data with header """
 
