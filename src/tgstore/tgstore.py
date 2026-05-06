@@ -14,11 +14,14 @@ class TgStore:
         header_data,
         content_strm,
         store_path,
-        chunk_size: int = 1024 ** 2):
+        chunk_size: int=1024 ** 2):
         """ save data with header """
         with open(store_path, "wb") as dst_strm:
             tgstore = TgStore(chunk_size)
-            header = Header(dict(header_data))
+            if isinstance(header_data, Header):
+                header = Header(dict(header_data.header))
+            else:
+                header = Header(dict(header_data))
             header.content_length = sys.maxsize * 2 + 1
             tgstore.write_marker(dst_strm)
             header_start = dst_strm.tell()
@@ -38,7 +41,7 @@ class TgStore:
         header_data,
         content_path,
         store_path,
-        chunk_size: int = 1024 ** 2):
+        chunk_size: int=1024 ** 2):
         """ save data with header """
         with open(content_path, "rb") as src_strm:
             cls.save_stream(header_data, src_strm, store_path, chunk_size)
@@ -53,14 +56,14 @@ class TgStore:
         with open(store_path, "rb") as strm:
             tgstore = TgStore()
             tgstore.read_marker(strm)
-            result, _ = tgstore.read_header(strm)
+            result, _ = tgstore.read_header_with_strm(strm)
         return result
 
     @classmethod
     def save_header(cls,
             header_data,
             store_path,
-            chunk_size: int = 1024 ** 2):
+            chunk_size: int=1024 ** 2):
         """ save header """
         with tempfile.TemporaryFile() as tmp_content_strm:
             old_header = cls.read(store_path, tmp_content_strm, chunk_size)
@@ -73,18 +76,18 @@ class TgStore:
         
         
     @classmethod
-    def read(cls, store_path, dst_strm, chunk_size: int = 1024 ** 2):
+    def read(cls, store_path, dst_strm, chunk_size: int=1024 ** 2):
         """ read content """
         result = None
         with open(store_path, "rb") as strm:
             tgstore = TgStore(chunk_size)
             tgstore.read_marker(strm)
-            result, _ = tgstore.read_header(strm)
+            result, _ = tgstore.read_header_with_strm(strm)
             tgstore.read_content(result, strm, dst_strm) 
         return result 
 
     def __init__(self,
-        chunk_size: int = 1024 ** 2):
+        chunk_size: int=1024 ** 2):
         """ constructor """
         self._chunk_size = chunk_size
 
@@ -105,7 +108,7 @@ class TgStore:
         """ write maker """
         strm.write(b'TSTR')
 
-    def read_header(self, strm):
+    def read_header_with_strm(self, strm):
         """ read header from file"""
         result = Header()
         header_size = result.read_from_stream(strm)
