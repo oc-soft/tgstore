@@ -60,5 +60,35 @@ Hello world 3"""
         finally:
             os.remove(tgst_path)
 
+    def test_save_callable(self):
+        tgst_h, tgst_path = tempfile.mkstemp()
+        try:
+            os.close(tgst_h)
+            header = {
+                'content-type': 'plain/text',
+                'tags': [ 'txt', 'test' ]
+            }
+            src_content = """Hello world
+Hello world 2"""
+            with io.BytesIO(src_content.encode()) as src_strm:
+                tgstore.TgStore.save_stream(header, src_strm, tgst_path, 5) 
+            
+            with io.BytesIO() as dst_strm:
+                saved_header = None
+                def get_strm(header):
+                    nonlocal saved_header
+                    saved_header = header
+                    return dst_strm
+                tgstore.TgStore.read(tgst_path, get_strm, 3)
+
+                content = dst_strm.getvalue().decode()
+                self.assertEqual(src_content, content)
+                self.assertEqual(
+                    saved_header['content-type'], header['content-type'])
+                self.assertEqual(saved_header.tags, header['tags'])
+        finally:
+            os.remove(tgst_path)
+
+
 
 # vi: se ts=4 sw=4 et:

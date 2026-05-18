@@ -1,3 +1,4 @@
+import io
 import math
 import os
 import pathlib
@@ -83,6 +84,8 @@ class TgStore:
             tgstore = TgStore(chunk_size)
             tgstore.read_marker(strm)
             result, _ = tgstore.read_header_with_strm(strm)
+            if not isinstance(dst_strm, io.Writer):
+                dst_strm = dst_strm(result) 
             tgstore.read_content(result, strm, dst_strm) 
         return result 
 
