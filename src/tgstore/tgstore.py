@@ -132,7 +132,7 @@ class TgStore:
             if read_size == 0:
                 break
             if read_size < len(chunk):
-                chunk.resize(read_size)
+                chunk = chunk[:read_size]
             dst_strm.write(chunk)
 
     def write_content(self, src_strm, dst_strm):
@@ -144,7 +144,7 @@ class TgStore:
             if read_size == 0:
                 break
             if read_size < len(chunk):
-                chunk.resize(read_size)
+                chunk = chunk[:read_size]
             dst_strm.write(chunk)
             total_size += read_size
         return total_size
