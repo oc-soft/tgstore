@@ -84,7 +84,7 @@ class TgStore:
             tgstore = TgStore(chunk_size)
             tgstore.read_marker(strm)
             result, _ = tgstore.read_header_with_strm(strm)
-            if not isinstance(dst_strm, io.Writer):
+            if not isinstance(dst_strm, io.RawIOBase):
                 dst_strm = dst_strm(result) 
             tgstore.read_content(result, strm, dst_strm) 
         return result 
